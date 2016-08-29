@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Cisco TAC Tools</title>
+  <meta charset="utf-8">
+    
+  <!-- Allows for dynamic use on any screen size -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+  <!-- Needed for functionality -->
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    /* Remove the navbar's default margin-bottom and rounded borders */
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+      background-color: midnightblue;
+    }
+    
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 450px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      padding-top: 20px;
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: lightsteelblue;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height:auto;}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+        
+      <!-- Can change where this redirects to -->
+      <a class="navbar-brand" href="http://wwwin.cisco.com/c/cec/index.html">Cisco</a>
+    </div>
+      
+    <!-- Adds more tabs -->
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <!--<ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Projects</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>-->
+      <ul class="nav navbar-nav navbar-right">
+          
+          <!-- Add CEC Login feature here -->
+        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  
+<div class="container-fluid">
+  <div class="row content">
+      
+    <!-- Can add links or other things here -->
+    <div class="col-sm-2 sidenav">
+      <!--<p><a href="#">Link</a></p>
+      <p><a href="#">Link</a></p>
+      <p><a href="#">Link</a></p>-->
+    </div>
+      
+    <!-- The main tool -->
+    <div class="col-sm-8">
+      <h1 style="text-align:center">TAC RMA Advising Tool</h1>
+      <div class="container">
+        <form class="form-inline">
+          <div class="form-group">
+            <label for="PID" style="text-align:left">PID:</label>
+            <input type="text" id="PID" placeholder="Enter valid PID..." required>
+          </div>
+          <div class="form-group">
+            <label for="PID" style="text-align:left">Quantity:</label>
+            <input type="text" id="PID" placeholder="Enter quantity..." required>
+          </div>
+          <div class="form-group">
+            <label for="PID" style="text-align:left">Country:</label>
+            <input type="text" id="PID" placeholder="Enter valid country..." required>
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+      </div>
+    </div>
+      
+    <!-- Can add links or other things here -->
+    <div class="col-sm-2 sidenav">
+      <!--<div class="well">
+        <p>ADS</p>
+      </div>
+      <div class="well">
+        <p>ADS</p>
+      </div>-->
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid text-center">
+  <p>Created by: Miguel Berumen</p>
+</footer>
+
+</body>
+</html>
+
