@@ -92,21 +92,28 @@
     <div class="col-sm-8">
       <h1 style="text-align:center">TAC RMA Advising Tool</h1>
       <div class="container">
-        <form class="form-inline">
+        <form >
           <div class="form-group">
             <label for="PID" style="text-align:left">PID:</label>
             <input type="text" id="PID" placeholder="Enter valid PID..." required>
+            <span class="help-block">Make sure you enter a valid PID</span>
           </div>
           <div class="form-group">
-            <label for="PID" style="text-align:left">Quantity:</label>
-            <input type="text" id="PID" placeholder="Enter quantity..." required>
+            <label for="Quantity" style="text-align:left">Quantity:</label>
+            <input type="number" id="Quantity" placeholder="Enter quantity..." required>
+            <span class="help-block">Do not enter negative or decimal numbers</span>
           </div>
           <div class="form-group">
-            <label for="PID" style="text-align:left">Country:</label>
-            <input type="text" id="PID" placeholder="Enter valid country..." required>
+            <label for="Country" style="text-align:left">Country:</label>
+            <input type="text" id="Country" placeholder="Enter valid country..." required>
+            <span class="help-block">Make sure to check your spelling</span>
           </div>
-          <button type="submit" class="btn btn-default">Submit</button>
+          <button type="button" class="btn btn-primary" onclick="advise()">Submit</button>
+          <span class="help-block">Double check all your inputs before submitting</span>
         </form>
+        <div class="alert-success" id="proceed"></div>
+        <div class="alert-warning" id="yield"></div>
+        <div class="alert-danger" id="stop"></div>
       </div>
     </div>
       
@@ -121,6 +128,46 @@
     </div>
   </div>
 </div>
+
+<script>
+    function advise() {
+        var getPid = document.getElementById("PID").value.toUpperCase;
+        var getQuant = document.getElementById("Quantity").value;
+        var getCountry = document.getElementById("Country").value.toLowerCase;
+        
+        var inputData = {pid:getPid, quantity:getQuant, country:getCountry};
+        
+        var repFlag = false;
+        var demFlag = false;
+        var T2flag = false;
+        var quantFlag = false;
+        var countryFlag = false;
+        var totalFlags = 0;
+        var blacklist = ["argentina, brazil, china, india"];
+        
+        if (inputData.quantity <= 1) {
+            quantFlag = quantFlag;
+        }
+        else if (inputData.quantity < 10) {
+            
+        }
+        else {
+            
+        }
+        
+        switch(totalFlags) {
+            case totalFlags <= 0:
+                document.getElementById("proceed").innerHTML = "<strong>Success!<strong> You may feel comfortable proceeding with the RMA";
+                break;
+            case totalFlags <=9:
+                document.getElementById("yield").innerHTML = "<strong>Warning!<strong> It is advised that you do more research and consult with Ed Swenson before proceeding with the RMA";
+                break;
+            default:
+                document.getElementById("stop").innerHTML = "<strong>Danger!<strong> It is advised that you do not proceed with the RMA";
+                break;
+        }
+    }
+</script>
 
 <footer class="container-fluid text-center">
   <p>Created by: Miguel Berumen</p>
