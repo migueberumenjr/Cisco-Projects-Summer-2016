@@ -44,6 +44,18 @@
       }
       .row.content {height:auto;}
     }
+      
+    #PID {
+      text-transform:uppercase;
+    }
+
+    #Repair {
+      text-transform:lowercase;
+    }
+
+    #Country {
+      text-transform:lowercase;
+    }
   </style>
 </head>
 <body>
@@ -85,24 +97,21 @@
   display: flex;
   flex-wrap: wrap">
     <!-- Can add links or other things here -->
-    <div class="col-sm-3" style="display: flex;
-  flex-direction: column;background-color:lightgrey">
+    <div class="col-sm-3" style="background-color:lightgrey">
       <!--<p><a href="#">Link</a></p>
       <p><a href="#">Link</a></p>
       <p><a href="#">Link</a></p>-->
     </div>
       
     <!-- The main tool -->
-    <div class="col-sm-6" style="display: flex;
-  flex-direction: column;padding-bottom:50px">
+    <div class="col-sm-6" style="padding-bottom:50px">
         <h1 style="text-align:center">TAC RMA Advising Tool</h1>
-        <div class="col-sm-6" style="display: flex;
-  flex-direction: column">
+        <div class="col-sm-6" style="display: inline-block;">
             <form>
                 <div class="form-group">
                     <label for="PID" style="text-align:left">PID:</label>
-                    <input type="text" id="PID" placeholder="Enter valid PID..." required>
-                    <span class="help-block">Make sure you enter a valid PID</span>
+                    <input type="text" id="PID" placeholder="Enter valid PID..." onkeyup="return forceUpper(this);" required>
+                    <span class="help-block">Make sure to enter a valid PID</span>
                 </div>
                 <div class="form-group">
                     <label for="Quantity" style="text-align:left">Quantity:</label>
@@ -110,23 +119,32 @@
                     <span class="help-block">Do not enter negative or decimal numbers</span>
                 </div>
                 <div class="form-group">
+                    <label for="Demand" style="text-align:left">Demand:</label>
+                    <input type="number" id="Demand" placeholder="Enter 52 week demand..." required>
+                    <span class="help-block">Do not enter negative or decimal numbers</span>
+                </div>
+                <div class="form-group">
+                    <label for="Repair" style="text-align:left">Repaired?:</label>
+                    <input type="text" id="Repair" placeholder="Y/N..." onkeyup="return forceLower(this);" required>
+                    <span class="help-block">Make sure to enter only Y/N or y/n...</span>
+                </div>
+                <div class="form-group">
                     <label for="Country" style="text-align:left">Country:</label>
-                    <input type="text" id="Country" placeholder="Enter valid country..." required>
-                    <span class="help-block">Make sure to check your spelling</span>
+                    <input type="text" id="Country" placeholder="Enter valid country..." onkeyup="return forceLower(this);" required>
+                    <span class="help-block">Make sure to check country's spelling</span>
                 </div>
                 <button type="button" class="btn btn-primary" onclick="advise()">Submit</button>
                 <button type="reset" class="btn btn-info">Reset</button>
                 <span class="help-block">Double check all your inputs before submitting</span>
             </form>
         </div>
+        
         <!-- The results will be displayed here -->
-        <div class="col-sm-6" id="advice" style="display: flex;
-  flex-direction: column"></div>
+        <div class="col-sm-6" id="advice" style="display: inline-block;"></div>
     </div>
       
     <!-- Can add links or other things here -->
-    <div class="col-sm-3" style="display: flex;
-  flex-direction: column;background-color:lightgrey">
+    <div class="col-sm-3" style="background-color:lightgrey">
       <!--<div class="well">
         <p>ADS</p>
       </div>
@@ -138,70 +156,104 @@
 </div>
 
 <script>
+    function forceUpper(strInput) {
+        strInput.value = strInput.value.toUpperCase();
+    }
+    
+    function forceLower(strInput) {
+        strInput.value = strInput.value.toLowerCase();
+    }
+    
     function advise() {
         // Get inputs and store in variables
-        var getPid = document.getElementById("PID").value.toUpperCase;
+        var getPid = document.getElementById("PID").value;
         var getQuant = document.getElementById("Quantity").value;
-        var getCountry = document.getElementById("Country").value.toLowerCase;
+        var getDem = document.getElementById("Demand").value;
+        var getRep = document.getElementById("Repair").value;
+        var getCountry = document.getElementById("Country").value;
         
         // Store variables in an object
-        var inputData = {pid:getPid, quantity:getQuant, country:getCountry};
+        var inputData = {pid:getPid, quantity:getQuant, demand:getDem, repair:getRep, country:getCountry};
         
         // Flags for advice logic
         var repFlag = false;
         var demFlag = false;
-        var T2flag = false;
-        var quantFlag = false;
+        var quant1Flag = false;
+        var quant2Flag = false;
         var countryFlag = false;
         var totalFlags = 0;
         
         // List of blacklisted countries
-        var blacklist = ["argentina, brazil, china, india"];
+        var blacklist = ["argentina", "brazil", "china", "india"];
         
         // Flag logic for quantity requested
-        if (inputData.quantity <= 1) {
-            quantFlag = quantFlag;
+        if (inputData.quantity >= 10) {
+            quant1Flag = true;
+            quant2Flag = true;
+            totalFlags += 2;
         }
-        else if (inputData.quantity < 10) {
-            
+        else if (inputData.quantity < 10 && inputData.quantity > 1) {
+            quant1Flag = true;
+            totalFlags += 1;
         }
         else {
-            
+            totalFlags = totalFlags;
         }
         
         // Flag logic for country requested
+        for (var i = 0; i < blacklist.length; i++) {
+            if (inputData.country == blacklist[i]) {
+                countryFlag = true;
+                totalFlags += 1;
+                break;
+            }
+        }
         
         // Flag logic for PID repaired Y/N
+        if (inputData.repair == "n") {
+            repFlag = true;
+            totalFlags += 1;
+        }
+        else {
+            totalFlags = totalFlags;
+        }
         
         // Flag logic for demand of PID
-        
-        // Flag logic for T2 amount
-        
-        switch(totalFlags) {
+        if (inputData.demand == 0) {
+            demFlag = true;
+            totalFlags += 1;
+        }
+        else {
+            totalFlags = totalFlags;
+        }
+        window.alert(totalFlags);
+        switch(true) {
             case totalFlags <= 1:
-                document.getElementById("advice").innerHTML = '<div class="row">' + 
-                '<div class="alert alert-success" id="proceed">' + 
-                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
-                    '<strong>Success!<strong> You may feel comfortable proceeding with the RMA.' + 
-                '</div>' + 
-            '</div>';
+                document.getElementById("advice").innerHTML = 
+                    '<div class="row">' + 
+                        '<div class="alert alert-success" id="proceed">' + 
+                            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
+                            '<strong>Success!<strong> You may feel comfortable proceeding with the RMA.' + 
+                        '</div>' + 
+                    '</div>';
                 break;
-            case totalFlags <=9:
-                document.getElementById("advice").innerHTML = '<div class="row">' + 
-                '<div class="alert alert-warning" id="yield">' + 
-                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
-                    '<strong>Warning!<strong> It is advised that you do more research and consult with Ed Swenson before proceeding with the RMA.' + 
-                '</div>' + 
-            '</div>';
+            case totalFlags <= 3:
+                document.getElementById("advice").innerHTML = 
+                    '<div class="row">' + 
+                        '<div class="alert alert-warning" id="yield">' + 
+                            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
+                            '<strong>Warning!<strong> It is advised that you do more research and consult with Ed Swenson before proceeding with the RMA.' + 
+                        '</div>' + 
+                    '</div>';
                 break;
             default:
-                document.getElementById("advice").innerHTML = '<div class="row">' + 
-                '<div class="alert alert-danger" id="stop">' + 
-                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
-                    '<strong>Danger!<strong> It is advised that you do not proceed with the RMA.' + 
-                '</div>' + 
-            '</div>';
-                break;
+                document.getElementById("advice").innerHTML = 
+                    '<div class="row">' + 
+                        '<div class="alert alert-danger" id="stop">' + 
+                            '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
+                            '<strong>Danger!<strong> It is advised that you do not proceed with the RMA.' + 
+                        '</div>' + 
+                    '</div>';
         }
     }
 </script>
@@ -212,3 +264,4 @@
 
 </body>
 </html>
+
