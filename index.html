@@ -159,10 +159,26 @@
         // Import data from AllParts.csv
         d3.csv("AllParts.csv", function(data) {
             // Arrays for columns from CSV file
-            var pid = [], t2 = [], demand = [], repair = [], fgi = [];
+            var pid = [], t2 = [], repair = [], fgi = [];
             
             // Variables for data from CSV file for PID
             var getT2, getDem, getRep;
+            
+            // Flags for advice logic
+            // Yellow flags
+            var noRepair = false;
+            var lessThanT2 = false;
+            var warningQuant = false;
+            
+            // Red flags
+            var noDemand = true;
+            var dangerQuant = false;
+            var badCountry = false;
+            
+            // HTML document info on flags
+            var repaired;
+            var demand;
+            var enough;
             
             // Get user inputs and store in variables
             var getPid = document.getElementById("PID").value;
@@ -171,138 +187,118 @@
             
             // Store data from CSV file in arrays
             data.map(function(d) {
-                pid.push(d.PID);
-                t2.push(d.T2);
-                demand.push(d.Demand);
-                repair.push(d.Repair);
-                fgi.push(d.FGI);
+                pid.push(d["Part Number"]);
+                t2.push(d["Alloc Thshld 2 - ROP (T152)"]);
+                repair.push(d["Repair Flag"]);
+                fgi.push(d["FGI OHB (T18)"]);
             });
+            
+            console.log(pid);
+            console.log(getPid);
+            
+            demand = "No demand for this PID OR PID does not exist";
             
             // Find T2, Repair, and Demand values for selected PID
             for (var i = 0; i < pid.length; i++) {
                 if (getPid == pid[i]) {
                     getT2 = t2[i];
-                    getDem = demand[i];
                     getRep = repair[i];
                     getFGI = fgi[i];
+                    noDemand = false;
+                    demand = "Sufficient demand for this PID.";
                     break;
                 }
             }
             
-            getT2 = Number(getT2);
-            getDem = Number(getDem);
-            getFGI = Number(getFGI);
-            getRep = String(getRep).toLowerCase();
-
-            // Store variables in an object
-            var inputData = {PID:getPid, quantity:getQuant, demand:getDem, FGI:getFGI, repair:getRep, T2:getT2, country:getCountry};
-
-            // Flags for advice logic
-            // Yellow flags
-            // Red flags
-            var repFlag = false;
-            var demFlag = false;
-            var t2Flag = false;
-            var quant1Flag = false;
-            var quant2Flag = false;
-            var countryFlag = false;
-            var totalFlags = 0;
-            
-            // HTML document info on flags
-            var repaired;
-            var demanded;
-            var enough;
-
-            // List of blacklisted countries
-            var blacklist = ["argentina", "brazil", "china", "india"];
-
-            // Flag logic for quantity requested
-            if (inputData.quantity >= 10) {
-                quant1Flag = true;
-                quant2Flag = true;
-                totalFlags += 2;
-            }
-            else if (inputData.quantity < 10 && inputData.quantity > 2) {
-                quant1Flag = true;
-                totalFlags += 1;
-            }
-            else {
-                totalFlags = totalFlags;
-            }
-
-            // Flag logic for country requested
-            for (var i = 0; i < blacklist.length; i++) {
-                if (inputData.country == blacklist[i]) {
-                    countryFlag = true;
-                    totalFlags += 1;
-                    break;
-                }
-            }
-
-            // Flag logic for PID repaired Y/N
-            if (inputData.repair == "n") {
-                repFlag = true;
-                totalFlags += 1;
-                repaired = "The PID is not repaired.";
-            }
-            else if (getRep == "y") {
-                totalFlags = totalFlags;
-                repaired = "The PID requested is repaired.";
-            }
-            else {
-                window.alert("NOTE: Repair information on the selected PID is missing.");
-                repaired = "NOTE: Repair information on the selected PID is missing.";
-            }
-
-            // Flag logic for demand of PID
-            if (inputData.demand == 0) {
-                demFlag = true;
-                totalFlags += 1;
-                demanded = "Not enough demand for this PID.";
-            }
-            else {
-                totalFlags = totalFlags;
-                demanded = "Sufficient demand for this PID.";
-            }
-
-            // Flag logic for T2 amount
-            if (inputData.FGI < inputData.T2) {
-                t2Flag = true;
-                totalFlags += 1;
-                t2Amount = "Not enough stock for this PID";
-            }
-            else {
-                totalFlags = totalFlags;
-                t2Amount = "Sufficient stock for this PID."
-            }
-
-            switch(true) {
-                case totalFlags <= 1:
-                    document.getElementById("advice").innerHTML = 
-                        '<div class="row">' + 
-                            '<div class="alert alert-success" id="proceed">' + 
-                                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
-                                '<strong>Success!<strong> You may feel comfortable proceeding with the RMA. ' + repaired + " " + demanded + " " + t2Amount +
-                            '</div>' + 
-                        '</div>';
-                    break;
-                case totalFlags <= 4:
-                    document.getElementById("advice").innerHTML = 
-                        '<div class="row">' + 
-                            '<div class="alert alert-warning" id="yield">' + 
-                                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
-                                '<strong>Warning!<strong> It is advised that you do more research before proceeding with the RMA. ' + repaired + " " + demanded + " " + t2Amount +
-                            '</div>' + 
-                        '</div>';
-                    break;
-                default:
-                    document.getElementById("advice").innerHTML = 
+            if (noDemand) {
+                document.getElementById("advice").innerHTML = 
                         '<div class="row">' + 
                             '<div class="alert alert-danger" id="stop">' + 
                                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
-                                '<strong>Danger!<strong> It is advised that you do not proceed with the RMA. ' + repaired + " " + demanded + " " + t2Amount +
+                                '<strong>Danger!<strong> It is advised that you do not proceed with the RMA.<br>' + demand + 
                             '</div>' + 
                         '</div>';
+            }
+            else {
+                getT2 = Number(getT2);
+                getFGI = Number(getFGI);
+                getRep = String(getRep).toLowerCase();
+
+                // Store variables in an object
+                var inputData = {PID:getPid, quantity:getQuant, FGI:getFGI, repair:getRep, T2:getT2, country:getCountry};
+
+                // List of blacklisted countries
+                var blacklist = ["argentina", "brazil", "china", "india"];
+
+                // Flag logic for quantity requested
+                if (inputData.quantity >= 10) {
+                    DangerQuant = true;
+                }
+                else if (inputData.quantity < 10 && inputData.quantity > 2) {
+                    warningQuant = true;
+                }
+                else {
+                    console.log("Safe quantity requested");
+                }
+
+                // Flag logic for country requested
+                for (var i = 0; i < blacklist.length; i++) {
+                    if (inputData.country == blacklist[i]) {
+                        badCountry = true;
+                        break;
+                    }
+                }
+
+                // Flag logic for PID repaired Y/N
+                if (inputData.repair == "n") {
+                    noRepair = true;
+                    repaired = "The PID is not repaired.";
+                }
+                else if (getRep == "y") {
+                    repaired = "The PID requested is repaired.";
+                }
+                else {
+                    window.alert("NOTE: Repair information on the selected PID is missing.");
+                    repaired = "NOTE: Repair information on the selected PID is missing.";
+                }
+
+                // Flag logic for T2 amount
+                if (inputData.FGI < inputData.T2) {
+                    lessThanT2 = true;
+                    enough = "Not enough stock for this PID";
+                }
+                else {
+                    enough = "Sufficient stock for this PID."
+                }
+
+                switch(true) {
+                    case noRepair || lessThanT2 || warningQuant:
+                        document.getElementById("advice").innerHTML = 
+                            '<div class="row">' + 
+                                '<div class="alert alert-warning" id="yield">' + 
+                                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
+                                    '<strong>Warning!<strong> It is advised that you do more research before proceeding with the RMA.<br>' + repaired + "<br>" + demand + "<br>" + enough +
+                                '</div>' + 
+                            '</div>';
+                        break;
+                    case dangerQuant || badCountry:
+                        document.getElementById("advice").innerHTML = 
+                            '<div class="row">' + 
+                                '<div class="alert alert-danger" id="stop">' + 
+                                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
+                                    '<strong>Danger!<strong> It is advised that you do not proceed with the RMA.<br>' + repaired + "<br>" + demand + "<br>" + enough +
+                                '</div>' + 
+                            '</div>';
+                        break;
+                    default:
+                        document.getElementById("advice").innerHTML = 
+                            '<div class="row">' + 
+                                '<div class="alert alert-success" id="proceed">' + 
+                                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' + 
+                                    '<strong>Success!<strong> You may feel comfortable proceeding with the RMA.<br>' + repaired + "<br>" + demand + "<br>" + enough +
+                                '</div>' + 
+                            '</div>';
+                }
             }
         });
     }
@@ -314,3 +310,4 @@
 
 </body>
 </html>
+
